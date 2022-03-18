@@ -1,0 +1,868 @@
+for _,object in pairs(game:GetService("CoreGui"):GetDescendants()) do if object.Name == "Commandbar" or object.Name == "Commands" then return end end
+pcall(
+    function()
+        local PlayerService = game:GetService("Players")
+        if not workspace:FindFirstChild("Executed") then
+            -- Making the time script so it knows to reset or not
+            Instance.new("StringValue", workspace).Name = "Executed"
+            for i, v in pairs(PlayerService:GetPlayers()) do
+                if not v.Character:FindFirstChild("Time") then
+                    spawn(
+                        function()
+                            local Time = Instance.new("NumberValue", v.Character)
+                            Time.Name = "Time"
+                            spawn(
+                                function()
+                                    while v.Character:WaitForChild "Humanoid".Health > 0 do
+                                        wait(1)
+                                        Time.Value = Time.Value + 1
+                                    end
+                                end
+                            )
+                            v.CharacterAdded:Connect(
+                                function()
+                                    local Time = Instance.new("NumberValue", v.Character)
+                                    Time.Name = "Time"
+                                    spawn(
+                                        function()
+                                            while v.Character:WaitForChild "Humanoid".Health > 0 do
+                                                wait(1)
+                                                Time.Value = Time.Value + 1
+                                            end
+                                        end
+                                    )
+                                end
+                            )
+                        end
+                    )
+                end
+            end
+
+            game.Players.PlayerAdded:Connect(
+                function(v)
+                    v.CharacterAdded:Connect(
+                        function()
+                            local Time = Instance.new("NumberValue", v.Character)
+                            Time.Name = "Time"
+                            spawn(
+                                function()
+                                    while v.Character:WaitForChild "Humanoid".Health > 0 do
+                                        wait(1)
+                                        Time.Value = Time.Value + 1
+                                    end
+                                end
+                            )
+                        end
+                    )
+                end
+            )
+        end
+    end
+)
+
+local Opening = Instance.new("ScreenGui")
+local dog = Instance.new("ImageLabel")
+local UICorner = Instance.new("UICorner")
+local irdk = Instance.new("TextLabel")
+
+--Properties:
+
+Opening.Name = "Opening"
+Opening.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+Opening.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+dog.Name = "dog"
+dog.Parent = Opening
+dog.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+dog.BorderSizePixel = 0
+dog.Position = UDim2.new(-0.2, 0, 0.5, -50)
+dog.Size = UDim2.new(0, 100, 0, 100)
+dog.Image = "http://www.roblox.com/asset/?id=6136750973"
+dog.ImageTransparency = 1
+dog.BackgroundTransparency = 1
+
+UICorner.Parent = dog
+
+irdk.Name = "irdk"
+irdk.Parent = dog
+irdk.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+irdk.BackgroundTransparency = 1.000
+irdk.Position = UDim2.new(-0.300720215, 0, 1, 0)
+irdk.Size = UDim2.new(0, 165, 0, 23)
+irdk.Text = "what do i put here"
+irdk.TextColor3 = Color3.fromRGB(0, 0, 0)
+irdk.TextScaled = true
+irdk.TextSize = 14.000
+irdk.TextWrapped = true
+
+
+-- Gui to Lua
+-- Version: 3.2
+
+-- Instances:
+
+local Commandbar = Instance.new("ScreenGui")
+local CommandbarFrame = Instance.new("Frame")
+local Curve = Instance.new("UICorner")
+local CommandbarText = Instance.new("TextBox")
+local Curve_2 = Instance.new("UICorner")
+
+--Properties:
+
+Commandbar.Name = "Commandbar"
+Commandbar.Parent = game.CoreGui
+Commandbar.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+Commandbar.ResetOnSpawn = false
+
+CommandbarFrame.Name = "CommandbarFrame"
+CommandbarFrame.Parent = Commandbar
+CommandbarFrame.BackgroundColor3 = Color3.fromRGB(33, 33, 33)
+CommandbarFrame.BorderSizePixel = 0
+CommandbarFrame.Position = UDim2.new(0.505999982, -157, 1, -67)
+CommandbarFrame.Size = UDim2.new(0, 315, 0, 68)
+
+Curve.CornerRadius = UDim.new(0.200000003, 10)
+Curve.Name = "Curve"
+Curve.Parent = CommandbarFrame
+
+CommandbarText.Name = "CommandbarText"
+CommandbarText.Parent = CommandbarFrame
+CommandbarText.BackgroundColor3 = Color3.fromRGB(95, 95, 95)
+CommandbarText.Position = UDim2.new(0.0539682545, 0, 0.176470593, 0)
+CommandbarText.Size = UDim2.new(0, 280, 0, 44)
+CommandbarText.Font = Enum.Font.SourceSans
+CommandbarText.PlaceholderColor3 = Color3.fromRGB(43, 43, 43)
+CommandbarText.PlaceholderText = "Write your command here"
+CommandbarText.Text = ""
+CommandbarText.TextColor3 = Color3.fromRGB(0, 0, 0)
+CommandbarText.TextScaled = true
+CommandbarText.TextSize = 14.000
+CommandbarText.TextWrapped = true
+
+Curve_2.CornerRadius = UDim.new(0.200000003, 10)
+Curve_2.Name = "Curve"
+Curve_2.Parent = CommandbarText
+
+local LocalPlayer = game:GetService("Players").LocalPlayer
+
+local UIS = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local PlayerGui = game:GetService("CoreGui")
+local CommandbarUI = PlayerGui:WaitForChild("Commandbar")
+local CommandbarFrame = CommandbarUI:WaitForChild("CommandbarFrame")
+local CommandbarText = CommandbarFrame:WaitForChild("CommandbarText")
+CommandbarFrame.Visible = false
+
+local commands = {}
+local prefix = "."
+
+local debounce = true
+
+local function getRoot(Player)
+	if Player:IsA("Model") then
+		return Player.HumanoidRootPart
+	elseif Player.Parent == Players then
+		return Player.Character.HumanoidRootPart
+	end
+end
+
+
+
+local function GetShortenedPlrFromName(name)
+	name = string.lower(tostring(name))
+
+
+	if not game:GetService("Players"):FindFirstChild("random") and name == "random" then
+		local chosen = Players:GetChildren()[math.random(1, #Players:GetChildren())]
+		if chosen == LocalPlayer then
+			repeat game:GetService('RunService').Heartbeat:wait()
+				chosen = Players:GetChildren()[math.random(1, #Players:GetChildren())]
+			until chosen ~= LocalPlayer
+		end
+		return {chosen}	
+	end
+
+
+	if not game:GetService("Players"):FindFirstChild("me") and name == "me" or game:GetService("Players"):FindFirstChild("me") and game:GetService("Players"):FindFirstChild("me").ClassName ~= "Player" and name == "me" then
+		return {LocalPlayer}
+	end
+	if not game:GetService("Players"):FindFirstChild("all") and name == "all" or game:GetService("Players"):FindFirstChild("all") and game:GetService("Players"):FindFirstChild("all").ClassName ~= "Player" and name == "all" then
+		return game:GetService("Players"):GetPlayers()
+	end
+	if not game:GetService("Players"):FindFirstChild("others") and name == "others" or game:GetService("Players"):FindFirstChild("others") and game:GetService("Players"):FindFirstChild("others").ClassName ~= "Player" and name == "others" then
+		name = game:GetService("Players"):GetPlayers()
+		for i, v in pairs(name) do
+			if v == LocalPlayer then
+				table.remove(name, i)
+			end
+		end
+		return name
+	end
+
+	for i, v in pairs(game.Players:GetPlayers()) do
+		if string.lower(string.sub(v.Name, 1, #name)) == name then
+			return {v}
+		end
+	end
+
+	return nil
+end
+
+
+local function openCmdbar()
+	debounce = true
+	CommandbarText.PlaceholderText = "Write your command here"
+	local openCmdBarTween = TweenService:Create(CommandbarFrame, TweenInfo.new(.5, Enum.EasingStyle.Circular,  Enum.EasingDirection.Out), {Position = UDim2.new(0.506, -157, 0.937, -68), BackgroundTransparency = 0})
+	local fadeText = TweenService:Create(CommandbarText,TweenInfo.new(.5),{BackgroundTransparency = 0})
+	fadeText:Play()
+	openCmdBarTween:Play()
+	CommandbarFrame.Visible = true
+	wait(.25)
+	CommandbarText:CaptureFocus()
+	debounce = false
+end
+
+local FindFirstChild = function(Parent, Object)
+	return Parent:FindFirstChild(Object)
+end
+
+local Clone = function(Object)
+return Object:Clone()
+end
+
+local Destroy = function(Object)
+	Object:Destroy()
+end
+
+local GetCharacter = function()
+	return LocalPlayer.Character
+end
+
+local GetHumanoid = function(Character)
+	return Character and FindFirstChild(Character, "Humanoid") or FindFirstChild(GetCharacter(), "Humanoid")
+end
+
+local ReplaceHumanoid = function(Hum)
+	local Humanoid = Hum or GetHumanoid();
+	local NewHumanoid = Clone(Humanoid);
+    NewHumanoid.Parent = Humanoid.Parent
+    NewHumanoid.Name = Humanoid.Name
+    Workspace.Camera.CameraSubject = NewHumanoid
+    Destroy(Humanoid);
+    Instance.new("StringValue",LocalPlayer.Character).Name = "hReplaced"
+    return NewHumanoid
+end
+
+local CFrameTool = function(tool, pos)
+    local RightArm = FindFirstChild(GetCharacter(), "RightLowerArm") or FindFirstChild(GetCharacter(), "Right Arm");
+    local Arm = RightArm.CFrame * CFrame.new(0, -1, 0, 1, 0, 0, 0, 0, 1, 0, -1, 0);
+    local Frame = Arm:ToObjectSpace(pos):Inverse()
+
+    tool.Grip = Frame
+end
+
+local ReplaceCharacter = function()
+    local Char = LocalPlayer.Character
+    local Model = Instance.new("Model");
+    LocalPlayer.Character = Model
+    LocalPlayer.Character = Char
+    Destroy(Model);
+    return Char
+end
+
+local isSat = function(Char)
+    Char = Char or GetCharacter();
+    local Humanoid = GetHumanoid(Char);
+    if (Humanoid) then
+        return Humanoid.Sit
+    end
+end
+
+local getRoot = function(Char)
+	local Root = Char and Char:FindFirstChild("HumanoidRootPart") or Char:FindFirstChild("UpperTorso") or Char:FindFirstChild("Torso")
+	return Root
+end
+
+local function closeCmdbar()
+	debounce = true
+	wait(.015)
+	CommandbarText.PlaceholderText = ""
+	CommandbarText.Text = ""
+	local closeCmdBarTween = TweenService:Create(CommandbarFrame, TweenInfo.new(.5, Enum.EasingStyle.Circular,  Enum.EasingDirection.Out), {Position = UDim2.new(0.505999982, -157, 1, -67), BackgroundTransparency = 1})
+	local fadeText = TweenService:Create(CommandbarText,TweenInfo.new(.5),{BackgroundTransparency = 1})
+	fadeText:Play()
+	closeCmdBarTween:Play()
+	closeCmdBarTween.Completed:wait()
+	CommandbarFrame.Visible = false
+	debounce = false
+end
+
+local function checkIfIsCommand(Text)
+	local getcmd = string.split(string.lower(Text), " ")[1]
+	local getargs = string.split(string.lower(Text), " ")
+	
+	if string.sub(getcmd, 1, #prefix) == prefix then
+		getcmd = string.sub(getcmd, #prefix + 1, #getcmd)
+	end
+
+	for i, v in pairs(string.split(string.lower(Text), ",")) do
+		if i ~= 1 then
+			table.insert(getargs, v)
+		end
+	end
+	for i, v in pairs(string.split(string.lower(Text), ", ")) do
+		if i ~= 1 then
+			table.insert(getargs, v)
+		end
+	end
+	table.remove(getargs, 1)
+
+	for i, v in pairs(commands) do
+		if v[1] ~= nil and string.find(v[1], "/") then
+			for i2, v2 in pairs( string.split(v[1], "/") ) do
+
+				v2 = string.lower(v2)
+				if getcmd == v2 then
+					if v[4] ~= nil then
+						spawn(function()
+							v[3](unpack(getargs))
+						end)
+					else
+						spawn(function()
+							v[3]()
+						end) 
+					end
+					break
+				end
+
+			end
+		elseif v[1] ~= nil then
+			v[1] = string.lower(v[1])
+			if getcmd == v[1] then
+				if v[4] ~= nil then
+					spawn(function()
+						v[3](unpack(getargs))
+					end)
+				else
+					spawn(function()
+						v[3]() 
+					end)
+				end
+				break
+			end
+		end
+	end
+
+end
+
+LocalPlayer.Chatted:Connect(function(Message)
+   checkIfIsCommand(Message)
+end)
+
+local function addCommand(cmdname, desc, mainfunction, cmdargs)
+	for i, v in pairs(commands) do
+		if v[1] ~= nil and string.lower(v[1]) == string.lower(cmdname) then
+			return nil
+		end
+	end
+
+	if typeof(mainfunction) == "function" then
+		if cmdargs then
+			table.insert(commands, {cmdname, desc, mainfunction, cmdargs})
+		else
+			table.insert(commands, {cmdname, desc, mainfunction})
+		end
+	else
+		return nil
+	end
+end
+
+local function openingGui()
+	local tween = TweenService:Create(dog, TweenInfo.new(.5,Enum.EasingStyle.Circular,Enum.EasingDirection.Out), {Position = UDim2.new(0.5, -50,0.5, -50), ImageTransparency = 0, BackgroundTransparency = 0})
+	tween:Play()
+	wait(2.5)
+	local tween = TweenService:Create(dog, TweenInfo.new(.45,Enum.EasingStyle.Circular,Enum.EasingDirection.Out), {Position = UDim2.new(1, 0,0.5, -50), ImageTransparency = 1, BackgroundTransparency = 1})
+	tween:Play()
+	tween.Completed:wait()
+end
+
+
+
+UIS.InputBegan:Connect(function(input,isTyping)
+	if not debounce then
+		if isTyping then
+			return
+		elseif input.KeyCode == Enum.KeyCode.Semicolon then
+			openCmdbar()
+		end
+	end
+end)
+
+CommandbarText.FocusLost:Connect(function(EnterPressed)
+	if not debounce then
+		if EnterPressed then
+			spawn(function()
+				checkIfIsCommand(CommandbarText.Text)
+			end)
+			closeCmdbar()
+			CommandbarText.Text = ""
+		end
+	end
+end)
+
+
+openingGui()
+Opening:Destroy()
+
+addCommand("kill","kills",function(player)
+	if GetShortenedPlrFromName(player) ~= nil then
+		local Player
+		for _,v in pairs(GetShortenedPlrFromName(player)) do
+			Player = v
+			sc,er = pcall(function ()
+			pos = FindFirstChild(GetCharacter(), "HumanoidRootPart").CFrame -- also one of my 2019 shitty scripts
+			local TargetCharacter = Player.Character
+			if TargetCharacter:FindFirstChild("Time") then
+			if TargetCharacter.Time.Value < GetCharacter().Time.Value then
+			GetCharacter():ClearAllChildren()
+			LocalPlayer.CharacterAdded:Wait()
+			repeat wait() until FindFirstChild(GetCharacter(), "HumanoidRootPart")
+			FindFirstChild(GetCharacter(), "HumanoidRootPart").CFrame = pos
+			elseif TargetCharacter.Time.Value == GetCharacter().Time.Value then
+			GetCharacter():ClearAllChildren()
+			LocalPlayer.CharacterAdded:Wait()
+			repeat wait() until FindFirstChild(GetCharacter(), "HumanoidRootPart")
+			FindFirstChild(GetCharacter(), "HumanoidRootPart").CFrame = pos
+			end
+			end
+			TargetCharacter = nil
+			end)
+			warn(sc,er)
+			ReplaceHumanoid();
+			local Tool = LocalPlayer.Backpack:FindFirstChildOfClass("Tool")
+			Tool.Parent = LocalPlayer.Character
+			Tool.Handle.Size = Vector3.new(4,4,4)
+			CFrameTool(Tool, Player.Character.HumanoidRootPart.CFrame)
+			firetouchinterest(getRoot(Player.Character), Tool.Handle, 0);
+			firetouchinterest(getRoot(Player.Character), Tool.Handle, 1);
+			LocalPlayer.Character.Humanoid:ChangeState(15)
+			wait(.3);
+			LocalPlayer.Character:Destroy()
+			LocalPlayer.CharacterAdded:Wait()
+			repeat wait() until FindFirstChild(GetCharacter(), "HumanoidRootPart")
+			FindFirstChild(GetCharacter(), "HumanoidRootPart").CFrame = pos
+		end
+	end
+end,"player")
+
+addCommand("kill2","kills",function(player)
+	if GetShortenedPlrFromName(player) ~= nil then
+		local Player
+		for _,v in pairs(GetShortenedPlrFromName(player)) do
+			Player = v
+			sc,er = pcall(function ()
+			pos = FindFirstChild(GetCharacter(), "HumanoidRootPart").CFrame -- also one of my 2019 shitty scripts
+			local TargetCharacter = Player.Character
+			if TargetCharacter:FindFirstChild("Time") then
+			if TargetCharacter.Time.Value < GetCharacter().Time.Value then
+			GetCharacter():ClearAllChildren()
+			LocalPlayer.CharacterAdded:Wait()
+			repeat wait() until FindFirstChild(GetCharacter(), "HumanoidRootPart")
+			FindFirstChild(GetCharacter(), "HumanoidRootPart").CFrame = pos
+			elseif TargetCharacter.Time.Value == GetCharacter().Time.Value then
+			GetCharacter():ClearAllChildren()
+			LocalPlayer.CharacterAdded:Wait()
+			repeat wait() until FindFirstChild(GetCharacter(), "HumanoidRootPart")
+			FindFirstChild(GetCharacter(), "HumanoidRootPart").CFrame = pos
+			end
+			end
+			TargetCharacter = nil
+			end)
+			warn(sc,er)
+			local h = GetHumanoid();
+			ReplaceCharacter();
+			GetHumanoid().WalkSpeed = 0;
+			GetHumanoid().JumpPower = 0;
+			wait(tonumber(game:GetService('Players').RespawnTime))
+			ReplaceHumanoid();
+			local Tool = LocalPlayer.Backpack:FindFirstChildOfClass("Tool")
+			Tool.Parent = LocalPlayer.Character
+			Tool.Handle.Size = Vector3.new(4,4,4)
+			CFrameTool(Tool, Player.Character.HumanoidRootPart.CFrame)
+			firetouchinterest(getRoot(Player.Character), Tool.Handle, 0);
+			firetouchinterest(getRoot(Player.Character), Tool.Handle, 1);
+			LocalPlayer.Character.Humanoid:ChangeState(15)
+			wait(.3);
+			LocalPlayer.Character:Destroy()
+			LocalPlayer.CharacterAdded:Wait()
+			repeat wait() until FindFirstChild(GetCharacter(), "HumanoidRootPart")
+			FindFirstChild(GetCharacter(), "HumanoidRootPart").CFrame = pos
+		end
+	end
+end,"player")
+
+addCommand("goto","goes to the player",function(player)
+	if GetShortenedPlrFromName(player) ~= nil then
+		local Player
+		for _,v in pairs(GetShortenedPlrFromName(player)) do
+			Player = v
+			GetCharacter().HumanoidRootPart.CFrame = getRoot(Player.Character).CFrame
+		end
+	end
+end,"player")
+
+addCommand("bring","Brings the player",function(player)
+	if GetShortenedPlrFromName(player) ~= nil then
+		local Player
+		for _,v in pairs(GetShortenedPlrFromName(player)) do
+			Player = v
+			sc,er = pcall(function ()
+			pos = FindFirstChild(GetCharacter(), "HumanoidRootPart").CFrame -- also one of my 2019 shitty scripts
+			local TargetCharacter = Player.Character
+			if TargetCharacter:FindFirstChild("Time") then
+			if TargetCharacter.Time.Value < GetCharacter().Time.Value then
+			GetCharacter():ClearAllChildren()
+			LocalPlayer.CharacterAdded:Wait()
+			repeat wait() until FindFirstChild(GetCharacter(), "HumanoidRootPart")
+			FindFirstChild(GetCharacter(), "HumanoidRootPart").CFrame = pos
+			elseif TargetCharacter.Time.Value == GetCharacter().Time.Value then
+			GetCharacter():ClearAllChildren()
+			LocalPlayer.CharacterAdded:Wait()
+			repeat wait() until FindFirstChild(GetCharacter(), "HumanoidRootPart")
+			FindFirstChild(GetCharacter(), "HumanoidRootPart").CFrame = pos
+			end
+			end
+			TargetCharacter = nil
+			end)
+			warn(sc,er)
+			ReplaceHumanoid();
+			local Tool = LocalPlayer.Backpack:FindFirstChildOfClass("Tool")
+			Tool.Parent = LocalPlayer.Character
+			Tool.Handle.Size = Vector3.new(4,4,4)
+			CFrameTool(Tool, LocalPlayer.Character.HumanoidRootPart.CFrame)
+			if (not syn) then wait(.1) end
+			for i = 1,3 do
+			firetouchinterest(getRoot(Player.Character), Tool.Handle, 0);
+			wait();
+			firetouchinterest(getRoot(Player.Character), Tool.Handle, 1);
+			end
+			wait(.2)
+			LocalPlayer.Character:Destroy()
+			LocalPlayer.CharacterAdded:Wait()
+			repeat wait() until FindFirstChild(GetCharacter(), "HumanoidRootPart")
+			FindFirstChild(GetCharacter(), "HumanoidRootPart").CFrame = pos
+		end
+	end
+end,"player")
+
+addCommand("bring2","Brings the player",function(player)
+	if GetShortenedPlrFromName(player) ~= nil then
+		local Player
+		for _,v in pairs(GetShortenedPlrFromName(player)) do
+			Player = v
+			sc,er = pcall(function ()
+			pos = FindFirstChild(GetCharacter(), "HumanoidRootPart").CFrame -- also one of my 2019 shitty scripts
+			local TargetCharacter = Player.Character
+			if TargetCharacter:FindFirstChild("Time") then
+			if TargetCharacter.Time.Value < GetCharacter().Time.Value then
+			GetCharacter():ClearAllChildren()
+			LocalPlayer.CharacterAdded:Wait()
+			repeat wait() until FindFirstChild(GetCharacter(), "HumanoidRootPart")
+			FindFirstChild(GetCharacter(), "HumanoidRootPart").CFrame = pos
+			elseif TargetCharacter.Time.Value == GetCharacter().Time.Value then
+			GetCharacter():ClearAllChildren()
+			LocalPlayer.CharacterAdded:Wait()
+			repeat wait() until FindFirstChild(GetCharacter(), "HumanoidRootPart")
+			FindFirstChild(GetCharacter(), "HumanoidRootPart").CFrame = pos
+			end
+			end
+			TargetCharacter = nil
+			end)
+			warn(sc,er)
+			local h = GetHumanoid();
+			ReplaceCharacter();
+			GetHumanoid().WalkSpeed = 0;
+			GetHumanoid().JumpPower = 0;
+			wait(tonumber(4.7))
+			ReplaceHumanoid(h);
+			local Tool = LocalPlayer.Backpack:FindFirstChildOfClass("Tool")
+			Tool.Parent = LocalPlayer.Character
+			Tool.Handle.Size = Vector3.new(4,4,4)
+			CFrameTool(Tool, LocalPlayer.Character.HumanoidRootPart.CFrame)
+			if (not syn) then wait(.1) end
+			for i = 1,3 do
+			firetouchinterest(getRoot(Player.Character), Tool.Handle, 0);
+			wait();
+			firetouchinterest(getRoot(Player.Character), Tool.Handle, 1);
+			end
+			wait(.2)
+			LocalPlayer.Character:Destroy()
+			LocalPlayer.CharacterAdded:Wait()
+			repeat wait() until FindFirstChild(GetCharacter(), "HumanoidRootPart")
+			FindFirstChild(GetCharacter(), "HumanoidRootPart").CFrame = pos
+		end
+	end
+end,"player")
+
+addCommand("teleport/tp","teleports a player to another",function(player, player2)
+	if GetShortenedPlrFromName(player) ~= nil and GetShortenedPlrFromName(player2) ~= nil then
+		local Player
+		local Player2
+		for _,v in pairs(GetShortenedPlrFromName(player)) do
+			Player = v
+			for i2, v2 in pairs(GetShortenedPlrFromName(player2)) do
+			    Player2 = v2
+			end
+	    end
+		sc,er = pcall(function ()
+		pos = FindFirstChild(GetCharacter(), "HumanoidRootPart").CFrame -- also one of my 2019 shitty scripts
+		local TargetCharacter = Player.Character
+		if TargetCharacter:FindFirstChild("Time") then
+		if TargetCharacter.Time.Value < GetCharacter().Time.Value then
+		GetCharacter():ClearAllChildren()
+		LocalPlayer.CharacterAdded:Wait()
+		repeat wait() until FindFirstChild(GetCharacter(), "HumanoidRootPart")
+		FindFirstChild(GetCharacter(), "HumanoidRootPart").CFrame = pos
+		elseif TargetCharacter.Time.Value == GetCharacter().Time.Value then
+		GetCharacter():ClearAllChildren()
+		LocalPlayer.CharacterAdded:Wait()
+		repeat wait() until FindFirstChild(GetCharacter(), "HumanoidRootPart")
+		FindFirstChild(GetCharacter(), "HumanoidRootPart").CFrame = pos
+		end
+		end
+		TargetCharacter = nil
+		end)
+		warn(sc,er)
+		ReplaceHumanoid();
+		local Tool = LocalPlayer.Backpack:FindFirstChildOfClass("Tool")
+		Tool.Parent = LocalPlayer.Character
+		Tool.Handle.Size = Vector3.new(4,4,4)
+		CFrameTool(Tool, Player2.Character.HumanoidRootPart.CFrame * CFrame.new(0, 5, 0))
+		if (not syn) then wait(.1) end
+		for i = 1,3 do
+		firetouchinterest(getRoot(Player.Character), Tool.Handle, 0);
+		wait();
+		firetouchinterest(getRoot(Player.Character), Tool.Handle, 1);
+		end
+		wait(.2)
+		LocalPlayer.Character:Destroy()
+		LocalPlayer.CharacterAdded:Wait()
+		repeat wait() until FindFirstChild(GetCharacter(), "HumanoidRootPart")
+		FindFirstChild(GetCharacter(), "HumanoidRootPart").CFrame = pos
+	end
+end,"player")
+
+addCommand("rejoin/rj","rejoins",function()
+	game:GetService('TeleportService'):TeleportToPlaceInstance(game.PlaceId, game.JobId, LocalPlayer)
+end)
+
+addCommand("cmds/commands","prints out the commands",function()
+	local ptext = ""
+	local numbervalue = 0
+	for _,_ in pairs(commands) do
+		numbervalue = numbervalue + 1
+	end
+	for value,command in pairs(commands) do
+		if value == numbervalue then
+			ptext = ptext..command[1].." which "..command[2]
+		else
+			ptext = ptext..command[1].." which "..command[2]..", "
+		end
+	end
+local ScreenGui = Instance.new("ScreenGui")
+local TopBar = Instance.new("Frame")
+local MainFrame = Instance.new("Frame")
+local Search = Instance.new("TextBox")
+local CommandList = Instance.new("ScrollingFrame")
+local UIListLayout = Instance.new("UIListLayout")
+local SearchIcon = Instance.new("ImageLabel")
+local CloseButton = Instance.new("ImageButton")
+local MinimiseButton = Instance.new("ImageButton")
+local TextLabel = Instance.new("TextLabel")
+
+--Properties:
+
+ScreenGui.Parent = game.CoreGui
+ScreenGui.Name = "Commands"
+
+TopBar.Name = "TopBar"
+TopBar.Parent = ScreenGui
+TopBar.BackgroundColor3 = Color3.fromRGB(64, 64, 64)
+TopBar.BorderSizePixel = 0
+TopBar.Position = UDim2.new(0.0189999994, 0, 0.310000002, 0)
+TopBar.Size = UDim2.new(0, 300, 0, 25)
+
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = TopBar
+MainFrame.BackgroundColor3 = Color3.fromRGB(33, 33, 33)
+MainFrame.BorderSizePixel = 0
+MainFrame.Position = UDim2.new(0, 0, 0.99999994, 0)
+MainFrame.Size = UDim2.new(0, 300, 0, 375)
+
+Search.Name = "Search"
+Search.Parent = MainFrame
+Search.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+Search.BorderSizePixel = 0
+Search.Position = UDim2.new(0.0929889455, 0, 0.0293333326, 0)
+Search.Size = UDim2.new(0, 259, 0, 25)
+Search.Font = Enum.Font.Gotham
+Search.PlaceholderColor3 = Color3.fromRGB(255, 255, 255)
+Search.PlaceholderText = "Search"
+Search.Text = ""
+Search.TextColor3 = Color3.fromRGB(255, 255, 255)
+Search.TextScaled = true
+Search.TextSize = 14.000
+Search.TextWrapped = true
+Search.TextXAlignment = Enum.TextXAlignment.Left
+
+CommandList.Name = "CommandList"
+CommandList.Parent = MainFrame
+CommandList.Active = true
+CommandList.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+CommandList.BorderSizePixel = 0
+CommandList.Position = UDim2.new(0.0399999991, 0, 0.128000006, 0)
+CommandList.Size = UDim2.new(0, 275, 0, 312)
+CommandList.CanvasSize = UDim2.new(0, 0, 2, 0)
+CommandList.ScrollBarThickness = 6
+
+SearchIcon.Name = "SearchIcon"
+SearchIcon.Parent = MainFrame
+SearchIcon.BackgroundTransparency = 1.000
+SearchIcon.Position = UDim2.new(-0.000669389963, 0, -0.437333345, 0)
+SearchIcon.Size = UDim2.new(0.0936583355, 0, 1, 0)
+SearchIcon.Image = "rbxassetid://3605509925"
+SearchIcon.ScaleType = Enum.ScaleType.Fit
+
+CloseButton.Name = "CloseButton"
+CloseButton.Parent = TopBar
+CloseButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+CloseButton.BackgroundTransparency = 1.000
+CloseButton.BorderSizePixel = 0
+CloseButton.Position = UDim2.new(0.915253282, 0, 0, 0)
+CloseButton.Size = UDim2.new(0, 25, 0, 25)
+CloseButton.Image = "rbxassetid://3944676352"
+
+MinimiseButton.Name = "MinimiseButton"
+MinimiseButton.Parent = TopBar
+MinimiseButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+MinimiseButton.BackgroundTransparency = 1.000
+MinimiseButton.BorderSizePixel = 0
+MinimiseButton.Position = UDim2.new(0.831919968, 0, 0, 0)
+MinimiseButton.Rotation = 90.000
+MinimiseButton.Size = UDim2.new(0, 25, 0, 25)
+MinimiseButton.Image = "rbxassetid://4400703447"
+
+TextLabel.Parent = TopBar
+TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel.BackgroundTransparency = 1.000
+TextLabel.Position = UDim2.new(0.216666669, 0, 0, 0)
+TextLabel.Size = UDim2.new(0, 170, 0, 25)
+TextLabel.Font = Enum.Font.Gotham
+TextLabel.Text = "Commands\n(Credits to fates admin)"
+TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel.TextScaled = true
+TextLabel.TextSize = 20.000
+TextLabel.TextWrapped = true
+
+function AddCommand(Pos, Name)
+local Command = Instance.new("TextLabel")
+    
+Command.Name = "Command"..Pos
+Command.Parent = CommandList
+Command.BackgroundColor3 = Color3.fromRGB(64, 64, 64)
+Command.BorderSizePixel = 0
+Command.Size = UDim2.new(0, 275, 0, 25)
+Command.Font = Enum.Font.Gotham
+Command.Text = Name
+Command.TextColor3 = Color3.fromRGB(255, 255, 255)
+Command.TextSize = 20.000
+Command.TextXAlignment = Enum.TextXAlignment.Left
+end
+
+for i,command in pairs(commands) do
+   if command[4] then
+      AddCommand(i, command[1].." <"..command[4]..">")
+   else
+      AddCommand(i, command[1])
+   end
+end
+
+UIListLayout.Parent = CommandList
+UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+UIListLayout.Padding = UDim.new(0, 5)
+
+local function WKWHX_fake_script() -- MainFrame.LocalScript 
+	local script = Instance.new('LocalScript', MainFrame)
+
+	local searchBar = script.Parent.Search
+	local scrollFrame = script.Parent.CommandList
+	local searchIcon = script.Parent.SearchIcon
+	script.Parent.Search.PlaceholderText = "Search"
+	
+	function updateSearch()
+		while wait(.2) do
+			for i,label in pairs(scrollFrame:GetChildren()) do
+				if label:IsA("TextLabel") then
+					local searchText = string.lower(searchBar.Text)
+					if searchText ~= "" then
+						local labelText = string.lower(label.Text)
+						if string.find(labelText, searchText) then
+							label.Visible = true
+						else
+							label.Visible = false
+						end
+					else
+						label.Visible = true
+					end
+				end
+			end
+		end
+	end
+	
+	spawn(updateSearch)
+end
+coroutine.wrap(WKWHX_fake_script)()
+local function ZWPHND_fake_script() -- TopBar.LocalScript 
+	local script = Instance.new('LocalScript', TopBar)
+
+	script.Parent.Position = UDim2.new(-1.019, 0,0.31, 0)
+	script.Parent:TweenPosition(UDim2.new(0.019, 0,0.31, 0), "Out", "Sine", 1, true)
+	script.Parent.Draggable = true
+	script.Parent.Active = true
+	
+	local minimiseButton = script.Parent.MinimiseButton
+	local closeButton = script.Parent.CloseButton
+	local commandslist = script.Parent.MainFrame.CommandList
+	
+	_G.Minimized = false
+	
+	minimiseButton.MouseButton1Click:Connect(function()
+	if _G.Minimized == false then
+	commandslist.Visible = false
+	script.Parent.MainFrame.Search.Visible = false
+	script.Parent.MainFrame.SearchIcon.Visible = false
+	script.Parent.MainFrame:TweenSize(UDim2.new(0, 300,0, 0), "In", "Sine", 1, true)
+	_G.Minimized = true
+	else
+	script.Parent.MainFrame:TweenSize(UDim2.new(0, 300,0, 375), "In", "Sine", 1, true)
+	wait(1)
+	commandslist.Visible = true
+	script.Parent.MainFrame.Search.Visible = true
+	script.Parent.MainFrame.SearchIcon.Visible = true
+	_G.Minimized = false
+	end
+	end)
+	
+	closeButton.MouseButton1Click:Connect(function()
+	script.Parent:TweenPosition(UDim2.new(-1.019, 0,0.31, 0), "Out", "Bounce", 1, true)
+	wait(1.5)
+	script.Parent:Destroy()
+	end)
+end
+coroutine.wrap(ZWPHND_fake_script)()
+
+end)
+debounce = false
